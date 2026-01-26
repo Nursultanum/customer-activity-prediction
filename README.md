@@ -1,126 +1,125 @@
-# Проект: Обучение с учителем — качество модели
+# Project: Supervised Learning — Model Quality
 
-## 📌 Описание проекта
+## 📌 Project Description
 
-Интернет-магазин «В один клик» столкнулся со снижением покупательской активности постоянных клиентов. Привлечение новых пользователей стало менее эффективным, поэтому бизнесу требуется решение для **удержания клиентов за счёт персонализированных предложений**.
+The online store *“One Click”* faced a decline in purchasing activity among its existing customers. Attracting new users has become less effective, so the business needs a solution to **retain customers through personalized offers**.
 
-В рамках проекта разработана модель машинного обучения, которая прогнозирует вероятность снижения покупательской активности клиента. На основе предсказанного риска и прибыльности выполнена **сегментация клиентов** и предложены **практические рекомендации для бизнеса**.
-
----
-
-## 🎯 Цели исследования
-
-* Определить факторы, влияющие на снижение покупательской активности.
-* Построить и сравнить несколько моделей классификации.
-* Выбрать лучшую модель по метрике **ROC-AUC**.
-* Провести сегментацию клиентов по риску снижения активности и прибыльности.
-* Разработать рекомендации по повышению активности ключевых сегментов.
+As part of this project, a machine learning model was developed to predict the probability of a decline in customer purchasing activity. Based on the predicted risk and customer profitability, **customer segmentation** was performed and **practical business recommendations** were proposed.
 
 ---
 
-## 📊 Данные
+## 🎯 Research Objectives
 
-Использованы данные интернет-магазина:
-
-* `market_file` — поведенческие и маркетинговые характеристики клиентов
-* `market_money` — выручка по месяцам
-* `market_time` — время, проведённое на сайте
-* `money` — среднемесячная прибыль по клиентам
-
-Все таблицы объединены по `id`, выполнена очистка данных, исправление опечаток и унификация признаков.
+- Identify factors influencing the decline in purchasing activity.
+- Build and compare several classification models.
+- Select the best model using the **ROC-AUC** metric.
+- Segment customers by risk of activity decline and profitability.
+- Develop recommendations to increase activity in key segments.
 
 ---
 
-## 🔧 Предобработка и EDA
+## 📊 Data
 
-* Унификация названий столбцов (snake_case)
-* Очистка категориальных значений (опечатки, пробелы)
-* Анализ распределений, выбросов и дисбаланса классов
-* Корреляционный анализ:
+Data from the online store were used:
 
-  * **Spearman** — для числовых признаков
-  * **Phik** — для смешанных (числовые + категориальные)
+- `market_file` — behavioral and marketing customer characteristics  
+- `market_money` — monthly revenue  
+- `market_time` — time spent on the website  
+- `money` — average monthly profit per customer  
 
----
-
-## 🤖 Моделирование
-
-Использован единый `Pipeline` с `ColumnTransformer`:
-
-* `OneHotEncoder` — для номинальных категориальных признаков
-* `OrdinalEncoder` — для упорядоченных категорий
-* `StandardScaler / MinMaxScaler / passthrough` — для числовых признаков
-
-Обучены и сравнены 4 модели:
-
-* `LogisticRegression (L1)`
-* `DecisionTreeClassifier`
-* `KNeighborsClassifier`
-* `SVC`
-
-Подбор гиперпараметров выполнен с помощью **RandomizedSearchCV (cv=5)**.
-Основная метрика — **ROC-AUC** (устойчива к дисбалансу и подходит для ранжирования риска).
+All tables were merged by `id`; data cleaning, typo correction, and feature standardization were performed.
 
 ---
 
-## ✅ Лучшая модель
+## 🔧 Preprocessing and EDA
+
+- Standardization of column names (`snake_case`)
+- Cleaning of categorical values (typos, extra spaces)
+- Analysis of distributions, outliers, and class imbalance
+- Correlation analysis:
+  - **Spearman** — for numerical features  
+  - **Phik** — for mixed features (numerical + categorical)
+
+---
+
+## 🤖 Modeling
+
+A unified `Pipeline` with `ColumnTransformer` was used:
+
+- `OneHotEncoder` — for nominal categorical features  
+- `OrdinalEncoder` — for ordered categorical features  
+- `StandardScaler / MinMaxScaler / passthrough` — for numerical features  
+
+Four models were trained and compared:
+
+- `LogisticRegression (L1)`  
+- `DecisionTreeClassifier`  
+- `KNeighborsClassifier`  
+- `SVC`  
+
+Hyperparameter tuning was performed using **RandomizedSearchCV (cv=5)**.  
+The primary metric was **ROC-AUC** (robust to class imbalance and suitable for risk ranking).
+
+---
+
+## ✅ Best Model
 
 **LogisticRegression (L1, C = 3, solver = liblinear)**
 
-* Средний ROC-AUC (CV): ≈ **0.898**
-* ROC-AUC на тестовой выборке: **0.923**
-* Значительно превосходит бейзлайн (DummyClassifier)
+- Mean ROC-AUC (CV): ≈ **0.898**  
+- ROC-AUC on the test set: **0.923**  
+- Significantly outperforms the baseline (DummyClassifier)
 
-L1-регуляризация позволила выполнить отбор информативных признаков и повысить интерпретируемость модели.
-
----
-
-## 🔍 Анализ важности признаков
-
-Использованы три подхода:
-
-* коэффициенты логистической регрессии (L1)
-* SHAP values
-* permutation importance (ROC-AUC)
-
-Наиболее значимые факторы:
-
-* вовлечённость на сайте (страниц_за_визит, просмотр категорий, время)
-* накопленная маркетинговая активность
-* доля акционных покупок и брошенные корзины
+L1 regularization enabled informative feature selection and improved model interpretability.
 
 ---
 
-## 📦 Сегментация клиентов
+## 🔍 Feature Importance Analysis
 
-Клиенты сегментированы по двум осям:
+Three approaches were used:
 
-* **Риск снижения активности** (`p_drop ≥ 0.5`)
-* **Прибыльность** (выше / ниже 75-го перцентиля)
+- logistic regression coefficients (L1)
+- SHAP values
+- permutation importance (ROC-AUC)
 
-Выделены 4 сегмента:
+Most influential factors:
 
-* **HR–HP** — высокий риск, высокая прибыльность (приоритетный)
-* HR–LP
-* LR–HP
-* LR–LP
-
----
-
-## 💡 Рекомендации для бизнеса
-
-Фокус на сегменте **HR–HP**:
-
-* персонализированные рекомендации по ключевым категориям
-* снижение зависимости от скидок (бонусы, кэшбэк, сервис)
-* работа с брошенными корзинами
-* постпродажные коммуникации и повышение вовлечённости
-
-Такой подход позволяет **максимизировать экономический эффект удержания**.
+- on-site engagement (pages per visit, category views, time spent)
+- accumulated marketing activity
+- share of promotional purchases and abandoned carts
 
 ---
 
-## 📁 Структура репозитория
+## 📦 Customer Segmentation
+
+Customers were segmented along two axes:
+
+- **Risk of activity decline** (`p_drop ≥ 0.5`)
+- **Profitability** (above / below the 75th percentile)
+
+Four segments were identified:
+
+- **HR–HP** — high risk, high profitability (priority segment)
+- HR–LP
+- LR–HP
+- LR–LP
+
+---
+
+## 💡 Business Recommendations
+
+Focus on the **HR–HP** segment:
+
+- personalized recommendations for key categories
+- reducing dependence on discounts (bonuses, cashback, service value)
+- abandoned cart recovery
+- post-purchase communications and engagement enhancement
+
+This approach helps **maximize the economic impact of retention efforts**.
+
+---
+
+## 📁 Repository Structure
 
 ```text
 supervised-learning/
@@ -130,4 +129,3 @@ supervised-learning/
 │   └── supervised_learning.ipynb
 ├── README.md
 └── .gitignore
-```
