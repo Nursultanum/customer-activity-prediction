@@ -1,4 +1,4 @@
-# Project: Supervised Learning — Model Quality
+# Project: Customer-activity-prediction -  Supervised Learning
 
 ## 📌 Project Description
 
